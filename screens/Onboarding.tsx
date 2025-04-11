@@ -1,12 +1,26 @@
 import {Image, SafeAreaView, StyleSheet, Text, TextInput, View} from "react-native";
-import {appColors} from "../assets/appColors";
 import ButtonComponent from "../components/ButtonComponent";
-import {useState} from "react";
+import {useLayoutEffect, useState} from "react";
+import {useNavigation} from "@react-navigation/native";
 
 const Onboarding = () => {
 
 	const [firstName, setFirstName] = useState('');
 	const [email, setEmail] = useState('');
+	const navigation = useNavigation();
+
+	useLayoutEffect(() => {
+		navigation.setOptions({
+			headerTitle: () => (
+				<Image
+					source={require('../assets/images/Logo.png')}
+					style={styles.headerImage}
+				/>
+			),
+			headerTitleAlign: 'center',
+		});
+	}, [navigation]);
+
 
 	const validateName = (name: string) => /^[A-Za-z]+$/.test(name);
 	const validateEmail = (email: string) =>
@@ -27,9 +41,6 @@ const Onboarding = () => {
 
 	return (
 		<SafeAreaView style={styles.container}>
-			<View style={styles.headerContainer}>
-				<Image style={styles.headerImage} source={require('../assets/images/Logo.png')}/>
-			</View>
 			<View style={styles.bodyContainer}>
 				<Text style={styles.bodyText}>Let us get to know you</Text>
 				<View style={{flex: 1}}/>
@@ -61,21 +72,17 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1
 	},
-	headerContainer: {
-		height: 100,
-		alignItems: 'center',
-		justifyContent: 'center',
-	},
 	headerImage: {
-		height: 60,
-		width: 250
+		width: 150,
+		height: 40,
+		resizeMode: 'contain'
 	},
 	bodyContainer: {
 		flex: 1,
 		// backgroundColor: appColors.primaryGreen,
 	},
 	inputContainer: {
-		marginBottom: 50,
+		marginBottom: 80,
 		marginHorizontal: 50
 	},
 	bodyText: {
