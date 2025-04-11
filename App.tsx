@@ -31,6 +31,14 @@ export default function App() {
 		checkOnboardingStatus();
 	}, [])
 
+	const onOnboardingComplete = () => {
+		setState({isLoading: false, isOnboardingComplete: true})
+	}
+
+	const onLogout = () => {
+		setState({isLoading: false, isOnboardingComplete: false})
+	}
+
 	if (state.isLoading) {
 		return <SplashScreen/>
 	}
@@ -39,10 +47,9 @@ export default function App() {
 		<NavigationContainer>
 			<Stack.Navigator>
 				{state.isOnboardingComplete ? (
-					<Stack.Screen name={"Profile"} component={Profile}/>
+					<Stack.Screen name={"Profile"} component={Profile} initialParams={{onLogout}}/>
 				) : (
-
-					<Stack.Screen name={"Onboarding"} component={Onboarding}/>
+					<Stack.Screen name={"Onboarding"} component={Onboarding} initialParams={{onOnboardingComplete}}/>
 				)}
 			</Stack.Navigator>
 		</NavigationContainer>

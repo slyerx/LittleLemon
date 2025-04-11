@@ -1,14 +1,14 @@
-import {Image, SafeAreaView, StyleSheet, Text, TextInput, View} from "react-native";
+import {Alert, Image, SafeAreaView, StyleSheet, Text, TextInput, View} from "react-native";
 import ButtonComponent from "../components/ButtonComponent";
 import {useLayoutEffect, useState} from "react";
-import {useNavigation} from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {appColors} from "../assets/appColors";
 
-const Onboarding = () => {
+const Onboarding = ({route, navigation}: any) => {
 
 	const [firstName, setFirstName] = useState('');
 	const [email, setEmail] = useState('');
-	const navigation = useNavigation();
+	const {onOnboardingComplete} = route.params;
 
 	useLayoutEffect(() => {
 		navigation.setOptions({
@@ -21,30 +21,29 @@ const Onboarding = () => {
 		});
 	}, [navigation]);
 
-
 	const validateName = (name: string) => /^[A-Za-z]+$/.test(name);
 	const validateEmail = (email: string) =>
 		/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
 	const handleNextPress = () => {
 		if (!firstName || !validateName(firstName)) {
-			alert('Please enter a valid first name (letters only).');
+			Alert.alert('Error', 'Please enter a valid first name (letters only).');
 			return;
 		}
 		if (!validateEmail(email)) {
-			alert('Please enter a valid email address.');
+			Alert.alert('Error', 'Please enter a valid email address.');
 			return;
 		}
 
 		const saveForm = async () => {
 			await AsyncStorage.setItem("firstName", firstName);
 			await AsyncStorage.setItem("email", email);
+			await AsyncStorage.setItem("onboardingComplete", "true");
 		}
 
 		saveForm().then(() => {
-			// Move to next page
+			onOnboardingComplete();
 		})
-
 	};
 
 	return (
@@ -68,7 +67,10 @@ const Onboarding = () => {
 				</View>
 			</View>
 			<View style={styles.footerContainer}>
-				<ButtonComponent title={'Next'} onPress={handleNextPress}/>
+				<ButtonComponent title={'Next'}
+								 onPress={handleNextPress}
+								 backgroundColor={appColors.primaryYellow}
+								 textColor={'black'}/>
 			</View>
 		</SafeAreaView>
 	)

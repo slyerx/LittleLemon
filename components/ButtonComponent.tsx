@@ -1,11 +1,18 @@
 import {StyleSheet, Text, TouchableOpacity} from "react-native";
-import {appColors} from "../assets/appColors";
 
-const ButtonComponent = ({title, onPress}: { title: string, onPress?: () => void }) => {
+const ButtonComponent = ({title, onPress, backgroundColor, textColor, borderColor}: {
+	title: string,
+	onPress?: () => void,
+	backgroundColor: string,
+	textColor: string,
+	borderColor?: string,
+}) => {
 
 	return (
-		<TouchableOpacity style={style.button} onPress={onPress}>
-			<Text style={style.buttonText}>{title}</Text>
+		<TouchableOpacity
+			style={[style.button, {backgroundColor: backgroundColor, borderColor: borderColor || 'transparent'}]}
+			onPress={onPress}>
+			<Text style={[style.buttonText, {color: textColor}]}>{title}</Text>
 		</TouchableOpacity>
 	)
 }
@@ -16,12 +23,12 @@ const style = StyleSheet.create({
 	button: {
 		height: 40,
 		borderRadius: 8,
+		borderWidth: 1,
 		justifyContent: "center",
-		backgroundColor: appColors.primaryYellow
 	},
 	buttonText: {
-		fontSize: 20,
-		marginHorizontal: 30,
-		color: 'black'
+		fontSize: 16,
+		marginHorizontal: 20,
+		alignSelf: "center"
 	}
 })
