@@ -2,6 +2,7 @@ import {Image, SafeAreaView, StyleSheet, Text, TextInput, View} from "react-nati
 import ButtonComponent from "../components/ButtonComponent";
 import {useLayoutEffect, useState} from "react";
 import {useNavigation} from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Onboarding = () => {
 
@@ -17,7 +18,6 @@ const Onboarding = () => {
 					style={styles.headerImage}
 				/>
 			),
-			headerTitleAlign: 'center',
 		});
 	}, [navigation]);
 
@@ -36,7 +36,15 @@ const Onboarding = () => {
 			return;
 		}
 
-		// Proceed to next step
+		const saveForm = async () => {
+			await AsyncStorage.setItem("firstName", firstName);
+			await AsyncStorage.setItem("email", email);
+		}
+
+		saveForm().then(() => {
+			// Move to next page
+		})
+
 	};
 
 	return (
