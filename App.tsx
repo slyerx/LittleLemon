@@ -5,6 +5,7 @@ import {useEffect, useState} from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import SplashScreen from "./screens/SplashScreen";
 import Profile from "./screens/Profile";
+import Home from "./screens/Home";
 
 const Stack = createNativeStackNavigator();
 
@@ -47,7 +48,10 @@ export default function App() {
 		<NavigationContainer>
 			<Stack.Navigator>
 				{state.isOnboardingComplete ? (
-					<Stack.Screen name={"Profile"} component={Profile} initialParams={{onLogout}}/>
+					<>
+						<Stack.Screen name={"Home"} component={Home}/>
+						<Stack.Screen name={"Profile"} component={Profile} initialParams={{onLogout}}/>
+					</>
 				) : (
 					<Stack.Screen name={"Onboarding"} component={Onboarding} initialParams={{onOnboardingComplete}}/>
 				)}

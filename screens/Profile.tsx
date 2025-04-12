@@ -17,11 +17,11 @@ import ButtonComponent from "../components/ButtonComponent";
 import {Checkbox} from "expo-checkbox";
 import * as ImagePicker from 'expo-image-picker';
 import DefaultProfilePicture from "../components/DefaultProfilePicture";
+import {dropTable} from "../services/sqlite";
 
 const Profile = ({route, navigation}: any) => {
 
 	const {onLogout} = route.params;
-
 
 	const [image, setImage] = useState('');
 	const [userInitials, setUserInitials] = useState('');
@@ -100,7 +100,7 @@ const Profile = ({route, navigation}: any) => {
 			setSpecialOffers(data.specialOffers === 'ture');
 			setNewsletter(data.newsletter === 'ture');
 
-			if (data.lastName[0] !== undefined) {
+			if (data.lastName) {
 				setUserInitials(`${data.firstName[0].toUpperCase()}${data.lastName[0].toUpperCase()}`);
 			} else {
 				setUserInitials(data.firstName[0]?.toUpperCase() ?? '');
@@ -243,7 +243,8 @@ const Profile = ({route, navigation}: any) => {
 				<View>
 					<ButtonComponent title={'Log out'} backgroundColor={appColors.primaryYellow} textColor={'black'}
 									 onPress={async () => {
-										 await AsyncStorage.clear()
+										 await AsyncStorage.clear();
+										 await dropTable();
 										 onLogout();
 									 }}/>
 
