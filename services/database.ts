@@ -26,3 +26,15 @@ export async function saveMenuItems(menuItems: MenuItem[]) {
 		console.log(e)
 	}
 }
+
+export async function filterByQueryAndCategories(query: string, activeCategories: string[]): Promise<MenuItem[]> {
+	const formattedQuery = `%${query}%`;
+	const placeholders = activeCategories.map(() => '?').join(', ');
+
+
+	return await db.getAllAsync(`SELECT *
+                                 FROM menuitems
+                                 WHERE name LIKE ? COLLATE NOCASE
+                                   AND category COLLATE NOCASE IN (${placeholders})`,
+		[formattedQuery, ...activeCategories]);
+}

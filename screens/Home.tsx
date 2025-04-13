@@ -1,13 +1,16 @@
-import {FlatList, Image, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
-import {useEffect, useLayoutEffect, useState} from "react";
+import {Alert, FlatList, Image, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
+import {useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState} from "react";
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import {appColors} from "../assets/appColors";
 import DefaultProfilePicture from "../components/DefaultProfilePicture";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {fetch} from "expo/fetch";
 import MenuItemComponent from "../components/MenuItemComponent";
-import {createTable, getAllItems, saveMenuItems} from "../services/sqlite";
-import ButtonComponent from "../components/ButtonComponent";
+import {createTable, filterByQueryAndCategories, getAllItems, saveMenuItems} from "../services/database";
+import debounce from 'lodash.debounce';
+import MenuFilters from "../components/MenuFilters";
+
+const menuSections = ['Starters', 'Mains', 'Desserts', 'Drinks']
 
 const Home = ({route, navigation}: any) => {
 
@@ -15,6 +18,12 @@ const Home = ({route, navigation}: any) => {
 	const [userInitials, setUserInitials] = useState('');
 
 	const [menuData, setMenuData] = useState<MenuItem[]>();
+
+	const [searchText, setSearchText] = useState('');
+	const [query, setQuery] = useState('');
+	const [filterSelections, setFilterSelections] = useState(
+		menuSections.map(() => false)
+	);
 
 	useLayoutEffect(() => {
 		navigation.setOptions({
@@ -109,7 +118,50 @@ const Home = ({route, navigation}: any) => {
 		}
 	};
 
+	const isInitialMount = useRef(true);
 
+	useEffect(() => {
+		if (isInitialMount.current) {
+			isInitialMount.current = false;
+		} else {
+			(async () => {
+				const activeCategories = menuSections.filter((s, i) => {
+					// If all filters are deselected, all categories are active
+					if (filterSelections.every((item) => !item)) {
+						return true;
+					}
+					return filterSelections[i];
+				});
+				try {
+					const menuItems: MenuItem[] = await filterByQueryAndCategories(
+						query,
+						activeCategories
+					);
+
+					setMenuData(menuItems);
+				} catch (e: any) {
+					Alert.alert(e.message);
+				}
+			})();
+		}
+	}, [filterSelections, query]);
+
+	const handleFiltersChange = async (index: number) => {
+		const arrayCopy = [...filterSelections];
+		arrayCopy[index] = !filterSelections[index];
+		setFilterSelections(arrayCopy);
+	}
+
+	const lookup = useCallback((q: string) => {
+		setQuery(q);
+	}, []);
+
+	const debouncedLookup = useMemo(() => debounce(lookup, 500), [lookup]);
+
+	const handleSearchChange = (text: string) => {
+		setSearchText(text);
+		debouncedLookup(text);
+	};
 	return (
 		<SafeAreaView style={styles.container}>
 			<View style={styles.heroContainer}>
@@ -127,22 +179,14 @@ const Home = ({route, navigation}: any) => {
 
 				<View style={styles.searchButton}>
 					<FontAwesome name="search" size={20} color={appColors.primaryGreen}/>
-					<TextInput style={styles.searchText}></TextInput>
+					<TextInput value={searchText} placeholder={"Search"}
+							   onChangeText={handleSearchChange} style={styles.searchText}></TextInput>
 				</View>
 			</View>
 
 			<View style={styles.filterContainer}>
 				<Text style={styles.orderText}>ORDER FOR DELIVERY!</Text>
-				<View style={styles.filterButtonsContainer}>
-					<ButtonComponent title={'Starters'} backgroundColor={appColors.secondaryGreen}
-									 textColor={appColors.primaryGreen} filterButton={true}/>
-					<ButtonComponent title={'Mains'} backgroundColor={appColors.secondaryGreen}
-									 textColor={appColors.primaryGreen} filterButton={true}/>
-					<ButtonComponent title={'Desserts'} backgroundColor={appColors.secondaryGreen}
-									 textColor={appColors.primaryGreen} filterButton={true}/>
-					<ButtonComponent title={'Drinks'} backgroundColor={appColors.secondaryGreen}
-									 textColor={appColors.primaryGreen} filterButton={true}/>
-				</View>
+				<MenuFilters onChange={handleFiltersChange} selections={filterSelections} sections={menuSections}/>
 			</View>
 
 			<View style={styles.separator}/>
@@ -210,7 +254,6 @@ const styles = StyleSheet.create({
 		alignSelf: "center"
 	},
 	searchButton: {
-		flex: 1,
 		flexDirection: "row",
 		marginTop: 10,
 		height: 40,
@@ -233,10 +276,4 @@ const styles = StyleSheet.create({
 		height: 40,
 		fontSize: 20,
 	},
-	filterButtonsContainer: {
-		flex: 1,
-		flexDirection: "row",
-		justifyContent: "space-between",
-		alignItems: "center",
-	}
 });

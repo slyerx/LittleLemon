@@ -17,7 +17,7 @@ import ButtonComponent from "../components/ButtonComponent";
 import {Checkbox} from "expo-checkbox";
 import * as ImagePicker from 'expo-image-picker';
 import DefaultProfilePicture from "../components/DefaultProfilePicture";
-import {dropTable} from "../services/sqlite";
+import {dropTable} from "../services/database";
 
 const Profile = ({route, navigation}: any) => {
 
