@@ -1,4 +1,4 @@
-import {FlatList, Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {FlatList, Image, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
 import {useEffect, useLayoutEffect, useState} from "react";
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import {appColors} from "../assets/appColors";
@@ -125,10 +125,9 @@ const Home = ({route, navigation}: any) => {
 					<Image style={styles.heroImage} source={require('../assets/images/Hero image.png')}/>
 				</View>
 
-				<View style={styles.searchContainer}>
-					<TouchableOpacity style={styles.searchButton}>
-						<FontAwesome name="search" size={25} color={appColors.primaryGreen}/>
-					</TouchableOpacity>
+				<View style={styles.searchButton}>
+					<FontAwesome name="search" size={20} color={appColors.primaryGreen}/>
+					<TextInput style={styles.searchText}></TextInput>
 				</View>
 			</View>
 
@@ -181,7 +180,9 @@ const styles = StyleSheet.create({
 		backgroundColor: appColors.highlightLight
 	},
 	heroContainer: {
-		padding: 20,
+		paddingHorizontal: 20,
+		paddingBottom: 20,
+		paddingTop: 10,
 		backgroundColor: appColors.primaryGreen,
 	},
 	heroTitle: {
@@ -208,17 +209,21 @@ const styles = StyleSheet.create({
 		borderRadius: 16,
 		alignSelf: "center"
 	},
-	searchContainer: {
-		marginTop: 10,
-		marginLeft: 10,
-	},
 	searchButton: {
+		flex: 1,
+		flexDirection: "row",
+		marginTop: 10,
+		height: 40,
 		backgroundColor: appColors.secondaryGreen,
-		height: 50,
-		width: 50,
-		justifyContent: 'center',
+		paddingHorizontal: 10,
 		alignItems: 'center',
-		borderRadius: 25
+		borderRadius: 8
+	},
+	searchText: {
+		flex: 1,
+		fontSize: 16,
+		color: 'black',
+		paddingLeft: 10
 	},
 	filterContainer: {
 		height: 120,
